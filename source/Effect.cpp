@@ -45,8 +45,8 @@ Effect::Effect(ID3D11Device* pDeviceInput, const std::wstring pathInput)
 
 Effect::~Effect()
 {
-	m_pEffect->Release();
 	m_pTechnique->Release();
+	m_pEffect->Release();
 	m_pInputLayout->Release();
 }
 

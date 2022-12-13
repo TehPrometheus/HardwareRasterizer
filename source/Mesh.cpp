@@ -43,7 +43,6 @@ Mesh::Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosCol>& vertice
 Mesh::~Mesh()
 {
 	delete m_pEffect;
-	m_pTechnique->Release();
 	m_pVertexBuffer->Release();
 	m_pIndexBuffer->Release();
 }

@@ -8,6 +8,13 @@ struct Vertex_PosCol
 	dae::ColorRGB color{ dae::colors::White };
 };
 
+struct Vertex_PosTex
+{
+	dae::Vector3 position{};
+	dae::Vector2 uv{};
+};
+
+
 
 class Mesh final
 {

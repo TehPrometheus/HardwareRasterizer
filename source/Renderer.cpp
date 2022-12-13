@@ -32,7 +32,6 @@ namespace dae {
 		}
 
 		//Initialize Mesh
-		//TODO: start here
 		m_pMesh = new Mesh(m_pDevice, m_Vertices, m_Indices);
 	}
 
@@ -53,6 +52,8 @@ namespace dae {
 		m_pDepthStencilView->Release();
 		m_pRenderTargetView->Release();
 		m_pRenderTargetBuffer->Release();
+
+		delete m_pMesh; 
 	}
 
 	void Renderer::Update(const Timer* pTimer)
@@ -264,3 +265,68 @@ namespace dae {
 		*/ 
 	}
 }
+
+/*
+	notes regarding Week 11
+	put the float 4x4 global at the top of your file (gworldviewproj)
+
+	the ID3DX11Effect* m_pEffect{} pointer in the effect class can be used to query data
+
+	slide 3: I believe the righthandside code needs to be inside the effect class we created
+	The left hand side is in the .hlsl file
+
+	in his effect class he has the m_pmatworldviewprojvariable of type ID3DX11EffectMatrixVariable*
+	
+	you need to call setmatrix on this m_pmatworldviewprojvariable in slide 4. You'll have to cast the variable it needs
+
+	you need to use the hlsl function mul which is used to multiply a float with a 4x4 matrix
+	inside the VS_OUTPUT function
+	instead of output.Position = ...
+	it is output.position = mul(float4(input.position,1.f),gworldviewproj);
+
+	for your quad. Create a new vertex type which has a position and a uv. You need 4 indices.
+	e.g. the uv values need to be from topleft starting: (0,0)->(1,0)->(1,1)->(0,1)
+
+	so you need a new struct VertexPosTex{} instead of posCol. Contains position and Vector2 uv.
+	defined in the Mesh.h file above the class. This also means you need a separate hlsl file where
+	the type of the uv is TEXTCOORD
+	float3 Position:POSITION;
+	float2 UV: TEXCOORD;
+
+	for output use float4 Position: SV_POSITION;
+
+	slide 5: implement
+	virtual void BuildInputLayout() = 0;
+	vitrtual void LoadEffectVariable() = 0;
+	because you have different inputs (color VS uv)
+
+	so he creates two child classes from the effect class, one called Effect_PosCol. One called Effect_PosTex
+	because the input is different. So change the effect class to a base class.
+	the 3 existing member variables of effect will need to be set to protected so they can be inherited
+	
+	the mesh constructor expects a vector of poscols. He templated it to also allow for a vector of postex objects
+	however I think you can also just add a second constructor for the mesh class
+
+	resources can only be interpreted through a resourceview
+
+	the texture class needs to be able to return the ID3D11ShaderResourceView. We need it to bind the texture to the shader
+
+	m_pSRV, seen in slide 6, is an object is your ID3D11ShaderResourceView, the most important part of your pipeline. It's a member variable of your
+	texture class.
+
+	every time he says 'shader' he's referring to the .hlsl file
+
+	getSRV() = get shader resource view
+
+	sample function of directX. The sampler stateS tells the sample function what we need to do if the uv 
+	coordinate goes outside of bounds. Second argument is the uv coordinate. Will return a float4 object (RGBA)
+
+	he has an m_pDevice variable stored in the effect class.
+	You cant call virtual functions in the constructor, that's why he has an m_pDevice pointer stored.
+	so he has an initialize function which is implemented in the child classes
+	it loadEfect
+	loadeffectvariale 
+	BuildInputLayout
+
+
+*/

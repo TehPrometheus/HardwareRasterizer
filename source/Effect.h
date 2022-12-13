@@ -27,7 +27,9 @@ private:
 	// Member variables						
 	//------------------------------------------------
 	ID3DX11Effect* m_pEffect{};
-	ID3D11InputLayout* m_pInputLayout{};
 	ID3DX11EffectTechnique* m_pTechnique{};
+	ID3D11InputLayout* m_pInputLayout{};
+
+
 };
 
