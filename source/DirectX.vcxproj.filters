@@ -41,6 +41,7 @@
     <ClInclude Include="DataTypes.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -63,5 +64,6 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
 </Project>

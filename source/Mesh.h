@@ -14,13 +14,9 @@ struct Vertex_PosTex
 	dae::Vector2 uv{};
 };
 
-
-
 class Mesh final
 {
 public:
-
-
 	Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosCol>& verticesInput, const std::vector<uint32_t>& indicesInput);
 	~Mesh();
 

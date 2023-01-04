@@ -9,10 +9,20 @@ namespace dae {
 		//Initialize Window
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 
+		//Initialize Aspect Ratio
+		m_AspectRatio = (float)m_Width / (float)m_Height;
+
+		//Initialize Camera
+		//m_pCamera = new Camera();
+
+
 		//Initialize Vertex Data
 		m_Vertices.push_back({ { 0.0f,  0.5f, 0.5f}, {colors::Red}   });
 		m_Vertices.push_back({ { 0.5f, -0.5f, 0.5f}, {colors::Blue}  });
 		m_Vertices.push_back({ {-0.5f, -0.5f, 0.5f}, {colors::Green} });
+		//m_Vertices.push_back({ { 0.0f,  3.f, 2.f}, {colors::Red}   });
+		//m_Vertices.push_back({ { 3., -3.f, 2.f}, {colors::Blue}  });
+		//m_Vertices.push_back({ {-3.f, -3.f, 2.f}, {colors::Green} });
 
 		//Initialize Index Data
 		m_Indices.push_back(0);
