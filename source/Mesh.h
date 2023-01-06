@@ -1,6 +1,8 @@
 #pragma once
 #include "DataTypes.h"
 #include "Effect.h"
+#include "Camera.h"
+
 
 struct Vertex_PosCol
 {
@@ -31,7 +33,7 @@ public:
 	//------------------------------------------------
 	// Member functions						
 	//------------------------------------------------
-	void Render(ID3D11DeviceContext* pDeviceContext) const;
+	void Render(ID3D11DeviceContext* pDeviceContext, Camera* pCamera) const;
 
 private:
 

@@ -48,8 +48,25 @@ Mesh::~Mesh()
 }
 
 
-void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
+void Mesh::Render(ID3D11DeviceContext* pDeviceContext, Camera* pCamera) const
 {
+	//1. Set Matrices
+	// TODO: start here. Triangle isn't appearing. Must be the worldmatrix?
+	//worldmatrix
+	dae::Matrix worldMatrix
+	{
+		Vector4{ 1,0,0, 0},
+		Vector4{ 0,1,0, 0},
+		Vector4{ 0,0,1, 0},
+		Vector4{ 0,0,0 ,1}
+	};
+	dae::Matrix viewMatrix{ pCamera->GetViewMatrix().Inverse() };
+	dae::Matrix inverseViewMatrix{ pCamera->GetViewMatrix() };
+	dae::Matrix projectionMatrix{ pCamera->GetProjectionMatrix() };
+	dae::Matrix worldViewProjectionMatrix{ worldMatrix * viewMatrix * projectionMatrix};
+
+	m_pEffect->SetWorldViewProjectionMatrix(worldViewProjectionMatrix);
+
 	//1. Set Primitive Topology
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

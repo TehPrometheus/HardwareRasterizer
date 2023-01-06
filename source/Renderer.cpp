@@ -13,16 +13,17 @@ namespace dae {
 		m_AspectRatio = (float)m_Width / (float)m_Height;
 
 		//Initialize Camera
-		//m_pCamera = new Camera();
+		m_pCamera = new Camera(45.f, {0,0,-10.f}, m_AspectRatio);
 
 
 		//Initialize Vertex Data
-		m_Vertices.push_back({ { 0.0f,  0.5f, 0.5f}, {colors::Red}   });
-		m_Vertices.push_back({ { 0.5f, -0.5f, 0.5f}, {colors::Blue}  });
-		m_Vertices.push_back({ {-0.5f, -0.5f, 0.5f}, {colors::Green} });
-		//m_Vertices.push_back({ { 0.0f,  3.f, 2.f}, {colors::Red}   });
-		//m_Vertices.push_back({ { 3., -3.f, 2.f}, {colors::Blue}  });
-		//m_Vertices.push_back({ {-3.f, -3.f, 2.f}, {colors::Green} });
+		//m_Vertices.push_back({ { 0.0f,  0.5f, 0.5f}, {colors::Red}   });
+		//m_Vertices.push_back({ { 0.5f, -0.5f, 0.5f}, {colors::Blue}  });
+		//m_Vertices.push_back({ {-0.5f, -0.5f, 0.5f}, {colors::Green} });
+
+		m_Vertices.push_back({ { 0.f,  3.f, 2.f}, {colors::Red}   });
+		m_Vertices.push_back({ { 3.f, -3.f, 2.f}, {colors::Blue}  });
+		m_Vertices.push_back({ {-3.f, -3.f, 2.f}, {colors::Green} });
 
 		//Initialize Index Data
 		m_Indices.push_back(0);
@@ -64,11 +65,12 @@ namespace dae {
 		m_pRenderTargetBuffer->Release();
 
 		delete m_pMesh; 
+		delete m_pCamera;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-		
+		m_pCamera->Update(pTimer);
 
 	}
 
@@ -86,7 +88,7 @@ namespace dae {
 
 
 		//2. Set Pipeline + Invoke drawcalls (=Render)
-		m_pMesh->Render(m_pDeviceContext);
+		m_pMesh->Render(m_pDeviceContext, m_pCamera);
 		
 
 		//4 Present Backbuffer (Swap)
@@ -163,12 +165,14 @@ namespace dae {
 		pDxgiFactory->Release();
 
 		//TODO 7: create DepthStencil (DS) & DepthstencilView (DSV) Resource
+		// depthstencil is een buffer. Een combinatie van 2 dingen. Hij wordt gebruikt als mask over uw image voor special effects zoals die fire effect
+		// depthstencil = depthbuffer + stencilbuffer = buffer voor opaque depth + buffer voor special effects. Superverwarrende naam.
 		D3D11_TEXTURE2D_DESC depthStencilDesc{};
 		depthStencilDesc.Width = m_Width;
 		depthStencilDesc.Height = m_Height;
 		depthStencilDesc.MipLevels = 1;
 		depthStencilDesc.ArraySize = 1;
-		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // D24= 24 bits, een unsigned normalized int om depth bij te houden. S8=8bits een unsigned int voor
 		depthStencilDesc.SampleDesc.Count = 1;
 		depthStencilDesc.SampleDesc.Quality = 0;
 		depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;

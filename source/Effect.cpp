@@ -41,6 +41,11 @@ Effect::Effect(ID3D11Device* pDeviceInput, const std::wstring pathInput)
 		assert(false && "Unable to create input layout in constructor of Mesh class");
 	}
 
+	// Link WorldViewProjection Matrix
+	m_pMatWorldViewProjVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
+	if (!m_pMatWorldViewProjVariable->IsValid())
+		std::wcout << L"variable gWorldViewProj not found\n";
+
 }
 
 Effect::~Effect()
@@ -111,4 +116,9 @@ ID3DX11EffectTechnique* Effect::GetTechniquePtr()
 ID3D11InputLayout* Effect::GetInputLayoutPtr()
 {
 	return m_pInputLayout;
+}
+
+void Effect::SetWorldViewProjectionMatrix(const dae::Matrix& worldViewProjectionMatrix)
+{
+	m_pMatWorldViewProjVariable->SetMatrix(reinterpret_cast<const float*>(&worldViewProjectionMatrix));
 }

@@ -6,7 +6,7 @@ using namespace dae;
 class Camera final
 {
 public:
-	Camera(float _fovAngle, const Vector3& _origin, float _aspectRatio);
+	Camera(float _fovAngle, const Vector3& _m_Origin, float _aspectRatio);
 
 	~Camera();
 
@@ -21,14 +21,16 @@ public:
 	//------------------------------------------------
 	// Member functions						
 	//------------------------------------------------
+	void Update(const Timer* pTimer);
 	void CalculateViewMatrix();
 	void CalculateProjectionMatrix();
-	// TODO: start here. Copy paste the update function from the software rasterizer.
+	Matrix GetViewMatrix();
+	Matrix GetProjectionMatrix();
 
 private:
 
 	//------------------------------------------------
-	// Member variables						
+	// Member Variables						
 	//------------------------------------------------
 
 	float m_TotalPitch{};
@@ -50,5 +52,11 @@ private:
 	Matrix m_ViewMatrix{};
 	Matrix m_InvViewMatrix{};
 	Matrix m_ProjectionMatrix{};
+
+	//------------------------------------------------
+	// Member Functions						
+	//------------------------------------------------
+
+
 };
 
