@@ -19,7 +19,7 @@ public:
 	Camera& operator=(Camera&& other) noexcept	= default;
 
 	//------------------------------------------------
-	// Member functions						
+	// Public member functions						
 	//------------------------------------------------
 	void Update(const Timer* pTimer);
 	void CalculateViewMatrix();
@@ -40,7 +40,7 @@ private:
 	const float m_FovAngle{ };
 	const float m_AspectRatio{};
 	const float m_MovementSpeed{ 20.f };
-	const float m_RotationSpeed{ 150.f };
+	const float m_RotationSpeed{ 1000.f };
 	const float m_NearPlane{ 0.1f };
 	const float m_FarPlane{ 100.f };
 
@@ -54,7 +54,7 @@ private:
 	Matrix m_ProjectionMatrix{};
 
 	//------------------------------------------------
-	// Member Functions						
+	// Private member functions						
 	//------------------------------------------------
 
 

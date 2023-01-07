@@ -20,6 +20,7 @@ class Mesh final
 {
 public:
 	Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosCol>& verticesInput, const std::vector<uint32_t>& indicesInput);
+	Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosTex>& verticesInput, const std::vector<uint32_t>& indicesInput, const std::string& diffuseMapPath);
 	~Mesh();
 
 	// -----------------------------------------------
@@ -31,19 +32,25 @@ public:
 	Mesh& operator=(Mesh&& other) noexcept	= default;
 
 	//------------------------------------------------
-	// Member functions						
+	// Public member functions						
 	//------------------------------------------------
 	void Render(ID3D11DeviceContext* pDeviceContext, Camera* pCamera) const;
-
+	ID3D11InputLayout* GetInputLayoutPtr();
+	Effect* GetEffectPtr() const;
 private:
 
 	//------------------------------------------------
 	// Member variables						
 	//------------------------------------------------
 	Effect* m_pEffect{};
-	ID3D11InputLayout* m_pTechnique{};
+	ID3D11InputLayout* m_pInputLayout{};
+
 	ID3D11Buffer* m_pVertexBuffer{};
 	ID3D11Buffer* m_pIndexBuffer{};
 	uint32_t m_NumIndices{};
+
+	Texture* m_pDiffuseMap{nullptr};
+
+
 };
 

@@ -2,60 +2,35 @@
 #include "Effect.h"
 #include <assert.h>
 
-Effect::Effect(ID3D11Device* pDeviceInput, const std::wstring pathInput)
+Effect::Effect(ID3D11Device* pDeviceInput, const std::wstring& pathInput)
 {
 	m_pEffect = LoadEffect(pDeviceInput, pathInput);
-	m_pTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
-	if (!m_pTechnique->IsValid())
-	{
-		std::wcout << L"Technique not valid\n";
-	}
 
-	//Create Vertex Layout
-	static constexpr uint32_t numElements{ 2 };
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
+	BindShaderTechniques();
 
-	vertexDesc[0].SemanticName = "POSITION";
-	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[0].AlignedByteOffset = 0;
-	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
-	vertexDesc[1].SemanticName = "COLOR";
-	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[1].AlignedByteOffset = 12;
-	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	//Create Input Layout
-	D3DX11_PASS_DESC passDesc{};
-	m_pTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	const HRESULT result = pDeviceInput->CreateInputLayout(
-		vertexDesc,
-		numElements,
-		passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize,
-		&m_pInputLayout);
-
-	if (FAILED(result))
-	{
-		assert(false && "Unable to create input layout in constructor of Mesh class");
-	}
-
-	// Link WorldViewProjection Matrix
+	// Bind WorldViewProjection Matrix
 	m_pMatWorldViewProjVariable = m_pEffect->GetVariableByName("gWorldViewProj")->AsMatrix();
 	if (!m_pMatWorldViewProjVariable->IsValid())
-		std::wcout << L"variable gWorldViewProj not found\n";
+	{
+		std::wcout << L"variable gWorldViewProj invalid\n";
+	}
+	// Bind Diffuse map
+	m_pDiffuseMapVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
+	if (!m_pDiffuseMapVariable->IsValid())
+	{
+		std::wcout << L"m_pDiffuseMapVariable invalid\n";
+	}
 
 }
 
 Effect::~Effect()
 {
-	m_pTechnique->Release();
+	m_pActiveTechnique->Release();
 	m_pEffect->Release();
-	m_pInputLayout->Release();
 }
 
-ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring assetFile)
+ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 {
 	HRESULT result;
 	ID3D10Blob* pErrorBlob{ nullptr };
@@ -110,15 +85,66 @@ ID3DX11Effect* Effect::LoadEffect(ID3D11Device* pDevice, const std::wstring asse
 
 ID3DX11EffectTechnique* Effect::GetTechniquePtr()
 {
-	return m_pTechnique;
+	return m_pActiveTechnique;
 }
 
-ID3D11InputLayout* Effect::GetInputLayoutPtr()
-{
-	return m_pInputLayout;
-}
 
 void Effect::SetWorldViewProjectionMatrix(const dae::Matrix& worldViewProjectionMatrix)
 {
 	m_pMatWorldViewProjVariable->SetMatrix(reinterpret_cast<const float*>(&worldViewProjectionMatrix));
+}
+
+void Effect::SetDiffuseMap(dae::Texture* pDiffuseTexture)
+{
+	if (m_pDiffuseMapVariable)
+		m_pDiffuseMapVariable->SetResource(pDiffuseTexture->GetResourceViewTexturePtr());
+}
+
+void Effect::ToggleSampleState()
+{
+	m_SampleState = static_cast<sampleState>((static_cast<int>(m_SampleState) + 1) % NROFSAMPLESTATES);
+
+	std::cout << "Sample State = ";
+	switch (m_SampleState)
+	{
+	case Effect::sampleState::point:
+		m_pActiveTechnique = m_pPointTechnique;
+		std::cout << "Point Sampling\n";
+		break;
+	case Effect::sampleState::linear:
+		m_pActiveTechnique = m_pLinearTechnique;
+		std::cout << "Linear Sampling\n";
+		break;
+	case Effect::sampleState::anisotropic:
+		m_pActiveTechnique = m_pAnisotropicTechnique;
+		std::cout << "Anisotropic Sampling\n";
+		break;
+	default:
+		break;
+	}
+
+}
+
+void Effect::BindShaderTechniques()
+{
+	m_pPointTechnique = m_pEffect->GetTechniqueByName("PointTechnique");
+	if (!m_pPointTechnique->IsValid())
+	{
+		std::wcout << L"PointTechnique invalid\n";
+	}
+
+	m_pLinearTechnique = m_pEffect->GetTechniqueByName("LinearTechnique");
+	if (!m_pLinearTechnique->IsValid())
+	{
+		std::wcout << L"Technique invalid\n";
+	}
+
+	m_pAnisotropicTechnique = m_pEffect->GetTechniqueByName("AnisotropicTechnique");
+	if (!m_pAnisotropicTechnique->IsValid())
+	{
+		std::wcout << L"Technique invalid\n";
+	}
+
+
+	m_pActiveTechnique = m_pPointTechnique;
 }

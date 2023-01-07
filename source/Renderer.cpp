@@ -17,18 +17,60 @@ namespace dae {
 
 
 		//Initialize Vertex Data
-		//m_Vertices.push_back({ { 0.0f,  0.5f, 0.5f}, {colors::Red}   });
-		//m_Vertices.push_back({ { 0.5f, -0.5f, 0.5f}, {colors::Blue}  });
-		//m_Vertices.push_back({ {-0.5f, -0.5f, 0.5f}, {colors::Green} });
-
+		/* triangle
 		m_Vertices.push_back({ { 0.f,  3.f, 2.f}, {colors::Red}   });
 		m_Vertices.push_back({ { 3.f, -3.f, 2.f}, {colors::Blue}  });
 		m_Vertices.push_back({ {-3.f, -3.f, 2.f}, {colors::Green} });
-
-		//Initialize Index Data
 		m_Indices.push_back(0);
 		m_Indices.push_back(1);
 		m_Indices.push_back(2);
+		*/
+
+
+		/* Quad
+		*/
+		m_Vertices.push_back({ { -3.f,  3.f, -2.f}, {   0,   0}   });
+		m_Vertices.push_back({ {  0.f,  3.f, -2.f}, {0.5f,   0}   });
+		m_Vertices.push_back({ {  3.f,  3.f, -2.f}, {   1,   0}   });
+		m_Vertices.push_back({ { -3.f,  0.f, -2.f}, {   0,0.5f}   });
+		m_Vertices.push_back({ {  0.f,  0.f, -2.f}, {0.5f,0.5f}   });
+		m_Vertices.push_back({ {  3.f,  0.f, -2.f}, {   1,0.5f}   });
+		m_Vertices.push_back({ { -3.f, -3.f, -2.f}, {   0,   1}   });
+		m_Vertices.push_back({ {  0.f, -3.f, -2.f}, {0.5f,   1}   });
+		m_Vertices.push_back({ {  3.f, -3.f, -2.f}, {   1,   1}   });
+
+		//Initialize Index Data
+		m_Indices.push_back(3);
+		m_Indices.push_back(0);
+		m_Indices.push_back(1);
+
+		m_Indices.push_back(1);
+		m_Indices.push_back(4);
+		m_Indices.push_back(3);
+		
+		m_Indices.push_back(4);
+		m_Indices.push_back(1);
+		m_Indices.push_back(2);
+		
+		m_Indices.push_back(2);
+		m_Indices.push_back(5);
+		m_Indices.push_back(4);
+		
+		m_Indices.push_back(6);
+		m_Indices.push_back(3);
+		m_Indices.push_back(4);
+		
+		m_Indices.push_back(4);
+		m_Indices.push_back(7);
+		m_Indices.push_back(6);
+		
+		m_Indices.push_back(7);
+		m_Indices.push_back(4);
+		m_Indices.push_back(5);
+		
+		m_Indices.push_back(5);
+		m_Indices.push_back(8);
+		m_Indices.push_back(7);
 
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
@@ -43,7 +85,7 @@ namespace dae {
 		}
 
 		//Initialize Mesh
-		m_pMesh = new Mesh(m_pDevice, m_Vertices, m_Indices);
+		m_pMesh = new Mesh(m_pDevice, m_Vertices, m_Indices, "Resources/uv_grid_2.png");
 	}
 
 	Renderer::~Renderer()
@@ -86,7 +128,7 @@ namespace dae {
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, &clearColor.r);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
-
+		
 		//2. Set Pipeline + Invoke drawcalls (=Render)
 		m_pMesh->Render(m_pDeviceContext, m_pCamera);
 		
@@ -94,6 +136,12 @@ namespace dae {
 		//4 Present Backbuffer (Swap)
 		m_pSwapChain->Present(0,0);
 	}
+
+	Mesh* Renderer::GetMeshPtr() const
+	{
+		return m_pMesh;
+	}
+
 
 	HRESULT Renderer::InitializeDirectX()
 	{

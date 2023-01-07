@@ -15,17 +15,29 @@ namespace dae
 		Renderer(SDL_Window* pWindow);
 		~Renderer();
 
+
+		// -----------------------------------------------
+		// Copy/move constructors and assignment operators
+		// -----------------------------------------------
 		Renderer(const Renderer&) = delete;
 		Renderer(Renderer&&) noexcept = delete;
 		Renderer& operator=(const Renderer&) = delete;
 		Renderer& operator=(Renderer&&) noexcept = delete;
 
+
+		//------------------------------------------------
+		// Public member functions						
+		//------------------------------------------------
 		void Update(const Timer* pTimer);
 		void Render() const;
-
+		Mesh* GetMeshPtr() const;
 	private:
-		SDL_Window* m_pWindow{};
 
+		//------------------------------------------------
+		// Member variables						
+		//------------------------------------------------
+
+		SDL_Window* m_pWindow{};
 		Camera* m_pCamera{};
 		
 		int m_Width{};
@@ -35,7 +47,7 @@ namespace dae
 		
 		bool m_IsInitialized{ false };
 
-		std::vector<Vertex_PosCol> m_Vertices{};
+		std::vector<Vertex_PosTex> m_Vertices{};
 		std::vector<uint32_t> m_Indices{};
 
 		Mesh* m_pMesh{};
@@ -50,9 +62,11 @@ namespace dae
 		ID3D11RenderTargetView* m_pRenderTargetView{};
 		ID3D11Resource* m_pRenderTargetBuffer{};
 		
-		//DIRECTX
+
+		//------------------------------------------------
+		// Private member functions						
+		//------------------------------------------------
 		HRESULT InitializeDirectX();
-		//...
 
 	};
 }
