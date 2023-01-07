@@ -47,8 +47,6 @@ namespace dae
 		
 		bool m_IsInitialized{ false };
 
-		std::vector<Vertex_PosTex> m_Vertices{};
-		std::vector<uint32_t> m_Indices{};
 
 		Mesh* m_pMesh{};
 

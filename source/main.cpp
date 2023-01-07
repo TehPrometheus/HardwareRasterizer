@@ -58,6 +58,10 @@ int main(int argc, char* args[])
 			case SDL_KEYUP:
 				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
 				{
+					pRenderer->GetMeshPtr()->ToggleRotation();
+				}
+				if (e.key.keysym.scancode == SDL_SCANCODE_F4)
+				{
 					pRenderer->GetMeshPtr()->GetEffectPtr()->ToggleSampleState();
 				}
 				break;

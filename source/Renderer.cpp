@@ -13,64 +13,7 @@ namespace dae {
 		m_AspectRatio = (float)m_Width / (float)m_Height;
 
 		//Initialize Camera
-		m_pCamera = new Camera(45.f, {0,0,-10.f}, m_AspectRatio);
-
-
-		//Initialize Vertex Data
-		/* triangle
-		m_Vertices.push_back({ { 0.f,  3.f, 2.f}, {colors::Red}   });
-		m_Vertices.push_back({ { 3.f, -3.f, 2.f}, {colors::Blue}  });
-		m_Vertices.push_back({ {-3.f, -3.f, 2.f}, {colors::Green} });
-		m_Indices.push_back(0);
-		m_Indices.push_back(1);
-		m_Indices.push_back(2);
-		*/
-
-
-		/* Quad
-		*/
-		m_Vertices.push_back({ { -3.f,  3.f, -2.f}, {   0,   0}   });
-		m_Vertices.push_back({ {  0.f,  3.f, -2.f}, {0.5f,   0}   });
-		m_Vertices.push_back({ {  3.f,  3.f, -2.f}, {   1,   0}   });
-		m_Vertices.push_back({ { -3.f,  0.f, -2.f}, {   0,0.5f}   });
-		m_Vertices.push_back({ {  0.f,  0.f, -2.f}, {0.5f,0.5f}   });
-		m_Vertices.push_back({ {  3.f,  0.f, -2.f}, {   1,0.5f}   });
-		m_Vertices.push_back({ { -3.f, -3.f, -2.f}, {   0,   1}   });
-		m_Vertices.push_back({ {  0.f, -3.f, -2.f}, {0.5f,   1}   });
-		m_Vertices.push_back({ {  3.f, -3.f, -2.f}, {   1,   1}   });
-
-		//Initialize Index Data
-		m_Indices.push_back(3);
-		m_Indices.push_back(0);
-		m_Indices.push_back(1);
-
-		m_Indices.push_back(1);
-		m_Indices.push_back(4);
-		m_Indices.push_back(3);
-		
-		m_Indices.push_back(4);
-		m_Indices.push_back(1);
-		m_Indices.push_back(2);
-		
-		m_Indices.push_back(2);
-		m_Indices.push_back(5);
-		m_Indices.push_back(4);
-		
-		m_Indices.push_back(6);
-		m_Indices.push_back(3);
-		m_Indices.push_back(4);
-		
-		m_Indices.push_back(4);
-		m_Indices.push_back(7);
-		m_Indices.push_back(6);
-		
-		m_Indices.push_back(7);
-		m_Indices.push_back(4);
-		m_Indices.push_back(5);
-		
-		m_Indices.push_back(5);
-		m_Indices.push_back(8);
-		m_Indices.push_back(7);
+		m_pCamera = new Camera(45.f, {0,0,-50.f}, m_AspectRatio);
 
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
@@ -85,7 +28,7 @@ namespace dae {
 		}
 
 		//Initialize Mesh
-		m_pMesh = new Mesh(m_pDevice, m_Vertices, m_Indices, "Resources/uv_grid_2.png");
+		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", "Resources/vehicle_diffuse.png");
 	}
 
 	Renderer::~Renderer()
@@ -113,7 +56,7 @@ namespace dae {
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_pCamera->Update(pTimer);
-
+		m_pMesh->Update(pTimer);
 	}
 
 
