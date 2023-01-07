@@ -227,11 +227,11 @@ void Mesh::ToggleRotation()
 	std::cout << "Rotation is ";
 	if (m_IsRotating)
 	{
-		std::cout << "Enabled\n";
+		std::cout << "enabled\n";
 	}
 	else
 	{
-		std::cout << "Disabled\n";
+		std::cout << "disabled\n";
 	}
 }
 
