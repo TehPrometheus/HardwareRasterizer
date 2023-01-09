@@ -27,8 +27,10 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		//Initialize Mesh
-		m_pMesh = new Mesh(m_pDevice, "Resources/vehicle.obj", "Resources/vehicle_diffuse.png");
+		//Initialize Meshes
+		m_pMeshArr[0] = new Mesh(m_pDevice, "Resources/vehicle.obj", "Resources/vehicle_diffuse.png", "Resources/vehicle_normal.png", "Resources/vehicle_specular.png", "Resources/vehicle_gloss.png", {0,0,50.f});
+		m_pMeshArr[1] = new Mesh(m_pDevice, "Resources/fireFX.obj", "Resources/fireFX_diffuse.png", { 0,0,50.f });
+
 	}
 
 	Renderer::~Renderer()
@@ -49,14 +51,22 @@ namespace dae {
 		m_pRenderTargetView->Release();
 		m_pRenderTargetBuffer->Release();
 
-		delete m_pMesh; 
+		for (Mesh*& mesh : m_pMeshArr)
+		{
+			delete mesh;
+			mesh = nullptr;
+		}
 		delete m_pCamera;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_pCamera->Update(pTimer);
-		m_pMesh->Update(pTimer);
+		for (Mesh*& mesh : m_pMeshArr)
+		{
+			mesh->Update(pTimer);
+		}
+
 	}
 
 
@@ -73,16 +83,24 @@ namespace dae {
 
 		
 		//2. Set Pipeline + Invoke drawcalls (=Render)
-		m_pMesh->Render(m_pDeviceContext, m_pCamera);
+		for (Mesh* mesh : m_pMeshArr)
+		{
+			mesh->Render(m_pDeviceContext, m_pCamera);
+		}
 		
 
 		//4 Present Backbuffer (Swap)
 		m_pSwapChain->Present(0,0);
 	}
 
-	Mesh* Renderer::GetMeshPtr() const
+	Mesh* Renderer::GetVehicleMeshPtr() const
 	{
-		return m_pMesh;
+		return m_pMeshArr[0];
+	}
+
+	Mesh* Renderer::GetFireMeshPtr() const
+	{
+		return m_pMeshArr[1];
 	}
 
 

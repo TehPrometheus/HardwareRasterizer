@@ -4,23 +4,25 @@
 #include "Camera.h"
 #include <fstream>
 
-struct Vertex_PosCol
+struct Vertex_Fire
 {
-	dae::Vector3 position{};
-	dae::ColorRGB color{ dae::colors::White };
+	Vector3 position{};
+	Vector2 uv{};
 };
 
-struct Vertex_PosTex
+struct Vertex_Vehicle
 {
-	dae::Vector3 position{};
-	dae::Vector2 uv{};
+	Vector3 position{};
+	Vector3 normal{};
+	Vector3 tangent{};
+	Vector2 uv{};
 };
 
 class Mesh final
 {
 public:
-	Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosCol>& verticesInput, const std::vector<uint32_t>& indicesInput);
-	Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath);
+	Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath, const Vector3& position);
+	Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath, const std::string& normalMapPath, const std::string& specularMapPath, const std::string& glossinessMapPath, const Vector3& position);
 	~Mesh();
 
 	// -----------------------------------------------
@@ -39,6 +41,7 @@ public:
 	ID3D11InputLayout* GetInputLayoutPtr();
 	Effect* GetEffectPtr() const;
 	void ToggleRotation();
+	bool GetIsRotating() const;
 
 private:
 
@@ -49,6 +52,8 @@ private:
 	float m_AccuSec{};
 	bool m_IsRotating{ true };
 
+	Vector3 m_Position{};
+
 	Effect* m_pEffect{};
 	ID3D11InputLayout* m_pInputLayout{};
 
@@ -56,13 +61,18 @@ private:
 	ID3D11Buffer* m_pIndexBuffer{};
 	uint32_t m_NumIndices{};
 
-	Texture* m_pDiffuseMap{nullptr};
+	Texture* m_pNormalMap		{ nullptr };
+	Texture* m_pDiffuseMap		{ nullptr };
+	Texture* m_pSpecularMap		{ nullptr };
+	Texture* m_pGlossinessMap	{ nullptr };
 
-	std::vector<Vertex_PosTex> m_Vertices{};
+
+	std::vector<Vertex_Vehicle> m_VehicleVertices{};
+	std::vector<Vertex_Fire> m_FireVertices{};
 	std::vector<uint32_t> m_Indices{};
 
-	void ParsePosTex(const std::string& filename);
+	void ParseFireObj(const std::string& filename);
 
-	bool ParseObj(const std::string& filename, std::vector<Vertex_In>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true);
+	bool ParseObj(const std::string& filename, std::vector<Vertex_Vehicle>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true);
 };
 

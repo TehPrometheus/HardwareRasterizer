@@ -3,7 +3,7 @@
 #include "DataTypes.h"
 #include "Mesh.h"
 #include "Camera.h"
-
+#include <array>
 struct SDL_Window;
 struct SDL_Surface;
 
@@ -30,7 +30,8 @@ namespace dae
 		//------------------------------------------------
 		void Update(const Timer* pTimer);
 		void Render() const;
-		Mesh* GetMeshPtr() const;
+		Mesh* GetVehicleMeshPtr() const;
+		Mesh* GetFireMeshPtr() const;
 	private:
 
 		//------------------------------------------------
@@ -42,29 +43,28 @@ namespace dae
 		
 		int m_Width{};
 		int m_Height{};
+		static const int m_NROFMESHES{ 2 };
 
 		float m_AspectRatio{};
 		
 		bool m_IsInitialized{ false };
 
 
-		Mesh* m_pMesh{};
+		std::array<Mesh*, m_NROFMESHES> m_pMeshArr{};
 
-		ID3D11Device* m_pDevice{};
-		ID3D11DeviceContext* m_pDeviceContext{};
-		IDXGISwapChain* m_pSwapChain{};
+		ID3D11Device* m_pDevice{ nullptr };
+		ID3D11DeviceContext* m_pDeviceContext{ nullptr };
+		IDXGISwapChain* m_pSwapChain{ nullptr };
 
-		ID3D11Texture2D* m_pDepthStencilBuffer{};
-		ID3D11DepthStencilView* m_pDepthStencilView{};
+		ID3D11Texture2D* m_pDepthStencilBuffer{ nullptr };
+		ID3D11DepthStencilView* m_pDepthStencilView{ nullptr };
 
-		ID3D11RenderTargetView* m_pRenderTargetView{};
-		ID3D11Resource* m_pRenderTargetBuffer{};
-		
+		ID3D11RenderTargetView* m_pRenderTargetView{ nullptr };
+		ID3D11Resource* m_pRenderTargetBuffer{ nullptr };
 
 		//------------------------------------------------
 		// Private member functions						
 		//------------------------------------------------
 		HRESULT InitializeDirectX();
-
 	};
 }
