@@ -1,83 +1,14 @@
 #include "pch.h"
 #include "Mesh.h"
-#include "Effect_PosTex.h"
+#include "Effect_Vehicle.h"
+#include "Effect_Fire.h"
 #include <assert.h>
 
-Mesh::Mesh(ID3D11Device* pDeviceInput, const std::vector<Vertex_PosCol>& verticesInput, const std::vector<uint32_t>& indicesInput)
+Mesh::Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath, const Vector3& position)
 {
-	m_pEffect = new Effect(pDeviceInput,L"Resources/PosCol3D.fx");
+	m_pEffect = new Effect_Fire(pDeviceInput,L"Resources/Fire_Shader.fx");
 
-	//Create Vertex Layout
-	static constexpr uint32_t numElements{ 2 };
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
-
-	vertexDesc[0].SemanticName = "POSITION";
-	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[0].AlignedByteOffset = 0;
-	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	vertexDesc[1].SemanticName = "COLOR";
-	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	vertexDesc[1].AlignedByteOffset = 12;
-	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-	//Create Input Layout
-	D3DX11_PASS_DESC passDesc{};
-	m_pEffect->GetTechniquePtr()->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	HRESULT result = pDeviceInput->CreateInputLayout(
-		vertexDesc,
-		numElements,
-		passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize,
-		&m_pInputLayout);
-
-	if (FAILED(result))
-	{
-		assert(false && "Unable to create input layout in constructor of Mesh class");
-	}
-
-
-	//Create vertex buffer
-	D3D11_BUFFER_DESC bd = {};
-	bd.Usage = D3D11_USAGE_IMMUTABLE;
-	bd.ByteWidth = sizeof(Vertex_PosCol) * static_cast<uint32_t>(verticesInput.size());
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
-	bd.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = verticesInput.data();
-	
-	result = pDeviceInput->CreateBuffer(&bd, &initData, &m_pVertexBuffer);
-	if (FAILED(result))
-	{
-		assert(false && "Unable to create vertex buffer in constructor of Mesh class");
-	}
-
-	//Create index buffer
-	m_NumIndices = static_cast<uint32_t>(indicesInput.size());
-	bd.Usage = D3D11_USAGE_IMMUTABLE;
-	bd.ByteWidth = sizeof(uint32_t) * m_NumIndices;
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = 0;
-	bd.MiscFlags = 0;
-	
-	initData.pSysMem = indicesInput.data();
-
-	result = pDeviceInput->CreateBuffer(&bd, &initData, &m_pIndexBuffer);
-	if (FAILED(result))
-	{
-		assert(false && "Unable to create index buffer in constructor of Mesh class");
-	}
-}
-
-Mesh::Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath)
-{
-	m_pEffect = new Effect_PosTex(pDeviceInput,L"Resources/PosTex3D.fx");
-
-	//Parse OBJ
-	ParsePosTex(objPath);
+	ParseFireObj(objPath);
 
 	//Create Vertex Layout
 	static constexpr uint32_t numElements{ 2 };
@@ -109,16 +40,17 @@ Mesh::Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::st
 		assert(false && "Unable to create input layout in constructor of Mesh class");
 	}
 
+
 	//Create vertex buffer
 	D3D11_BUFFER_DESC bd = {};
 	bd.Usage = D3D11_USAGE_IMMUTABLE;
-	bd.ByteWidth = sizeof(Vertex_PosTex) * static_cast<uint32_t>(m_Vertices.size());
+	bd.ByteWidth = sizeof(Vertex_Fire) * static_cast<uint32_t>(m_FireVertices.size());
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = m_Vertices.data();
+	initData.pSysMem = m_FireVertices.data();
 	
 	result = pDeviceInput->CreateBuffer(&bd, &initData, &m_pVertexBuffer);
 	if (FAILED(result))
@@ -144,6 +76,101 @@ Mesh::Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::st
 
 	m_pDiffuseMap = new dae::Texture(pDeviceInput, diffuseMapPath.c_str());
 	m_pEffect->SetDiffuseMap(m_pDiffuseMap);
+}
+
+Mesh::Mesh(ID3D11Device* pDeviceInput, const std::string& objPath, const std::string& diffuseMapPath, const std::string& normalMapPath, const std::string& specularMapPath, const std::string& glossinessMapPath, const Vector3& position)
+{
+	m_pEffect = new Effect_Vehicle(pDeviceInput,L"Resources/Vehicle_Shader.fx");
+
+	//Parse OBJ
+	ParseObj(objPath,m_VehicleVertices,m_Indices);
+
+	//Create Vertex Layout
+	static constexpr uint32_t numElements{ 4 };
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
+
+	vertexDesc[0].SemanticName = "POSITION";
+	vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[0].AlignedByteOffset = 0;
+	vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[1].SemanticName = "NORMAL";
+	vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[1].AlignedByteOffset = 12;
+	vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[2].SemanticName = "TANGENT";
+	vertexDesc[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	vertexDesc[2].AlignedByteOffset = 24;
+	vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	vertexDesc[3].SemanticName = "TEXCOORD";
+	vertexDesc[3].Format = DXGI_FORMAT_R32G32_FLOAT;
+	vertexDesc[3].AlignedByteOffset = 36;
+	vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	//Create Input Layout
+	D3DX11_PASS_DESC passDesc{};
+	m_pEffect->GetTechniquePtr()->GetPassByIndex(0)->GetDesc(&passDesc);
+
+	HRESULT result = pDeviceInput->CreateInputLayout(
+		vertexDesc,
+		numElements,
+		passDesc.pIAInputSignature,
+		passDesc.IAInputSignatureSize,
+		&m_pInputLayout);
+
+	if (FAILED(result))
+	{
+		assert(false && "Unable to create input layout in constructor of Mesh class");
+	}
+
+	//Create vertex buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_IMMUTABLE;
+	bd.ByteWidth = sizeof(Vertex_Vehicle) * static_cast<uint32_t>(m_VehicleVertices.size());
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA initData = {};
+	initData.pSysMem = m_VehicleVertices.data();
+	
+	result = pDeviceInput->CreateBuffer(&bd, &initData, &m_pVertexBuffer);
+	if (FAILED(result))
+	{
+		assert(false && "Unable to create vertex buffer in constructor of Mesh class");
+	}
+
+	//Create index buffer
+	m_NumIndices = static_cast<uint32_t>(m_Indices.size());
+	bd.Usage = D3D11_USAGE_IMMUTABLE;
+	bd.ByteWidth = sizeof(uint32_t) * m_NumIndices;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
+	
+	initData.pSysMem = m_Indices.data();
+
+	result = pDeviceInput->CreateBuffer(&bd, &initData, &m_pIndexBuffer);
+	if (FAILED(result))
+	{
+		assert(false && "Unable to create index buffer in constructor of Mesh class");
+	}
+
+	m_pDiffuseMap		= new dae::Texture(pDeviceInput, diffuseMapPath.c_str());
+	m_pNormalMap		= new dae::Texture(pDeviceInput, normalMapPath.c_str());
+	m_pSpecularMap		= new dae::Texture(pDeviceInput, specularMapPath.c_str());
+	m_pGlossinessMap	= new dae::Texture(pDeviceInput, glossinessMapPath.c_str());
+
+	m_pEffect->SetDiffuseMap(m_pDiffuseMap);
+	Effect_Vehicle* vehicleEffect{ dynamic_cast<Effect_Vehicle*>(m_pEffect) };
+	if (vehicleEffect)
+	{
+		vehicleEffect->SetNormalMap(m_pNormalMap->GetResourceViewTexturePtr());
+		vehicleEffect->SetSpecularMap(m_pSpecularMap->GetResourceViewTexturePtr());
+		vehicleEffect->SetGlossinessMap(m_pGlossinessMap->GetResourceViewTexturePtr());
+	}
 
 }
 
@@ -151,6 +178,9 @@ Mesh::~Mesh()
 {
 	delete m_pEffect;
 	delete m_pDiffuseMap;
+	delete m_pNormalMap;
+	delete m_pSpecularMap;
+	delete m_pGlossinessMap;
 	m_pVertexBuffer->Release();
 	m_pIndexBuffer->Release();
 	m_pInputLayout->Release();
@@ -164,19 +194,27 @@ void Mesh::Update(const Timer* pTimer)
 		m_AccuSec += pTimer->GetElapsed();
 	}
 
-	m_VehicleYaw = PI_DIV_2 * m_AccuSec;
+	m_VehicleYaw = PI_DIV_4 * m_AccuSec;
 }
 
 void Mesh::Render(ID3D11DeviceContext* pDeviceContext, Camera* pCamera) const
 {
 	//1. Set Matrices
-	dae::Matrix worldMatrix = Matrix::CreateRotationY(m_VehicleYaw);
+	dae::Matrix worldMatrix = Matrix::CreateTranslation(m_Position) * Matrix::CreateRotationY(m_VehicleYaw);
 	dae::Matrix viewMatrix{ pCamera->GetViewMatrix().Inverse() };
 	dae::Matrix inverseViewMatrix{ pCamera->GetViewMatrix() };
 	dae::Matrix projectionMatrix{ pCamera->GetProjectionMatrix() };
 	dae::Matrix worldViewProjectionMatrix{ worldMatrix * viewMatrix * projectionMatrix};
 
 	m_pEffect->SetWorldViewProjectionMatrix(worldViewProjectionMatrix);
+
+	Effect_Vehicle* vehicleEffect{ dynamic_cast<Effect_Vehicle*>(m_pEffect) };
+
+	if (vehicleEffect)
+	{
+		vehicleEffect->SetWorldMatrix(worldMatrix);
+		vehicleEffect->SetViewInverseMatrix(inverseViewMatrix);
+	}
 
 	//1. Set Primitive Topology
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -187,9 +225,13 @@ void Mesh::Render(ID3D11DeviceContext* pDeviceContext, Camera* pCamera) const
 	//3. Set VertexBuffer
 	UINT stride{};
 
-	if (dynamic_cast<Effect_PosTex*>(m_pEffect))
+	if (vehicleEffect)
 	{
-		stride = sizeof(Vertex_PosTex);
+		stride = sizeof(Vertex_Vehicle);
+	}
+	else
+	{
+		stride = sizeof(Vertex_Fire);
 	}
 	
 	constexpr UINT offset = 0;
@@ -223,37 +265,31 @@ Effect* Mesh::GetEffectPtr() const
 void Mesh::ToggleRotation()
 {
 	m_IsRotating = !m_IsRotating;
+}
 
-	std::cout << "Rotation is ";
-	if (m_IsRotating)
-	{
-		std::cout << "enabled\n";
-	}
-	else
-	{
-		std::cout << "disabled\n";
-	}
+bool Mesh::GetIsRotating() const
+{
+	return m_IsRotating;
 }
 
 
-void Mesh::ParsePosTex(const std::string& filename)
+void Mesh::ParseFireObj(const std::string& filename)
 {
-	std::vector<Vertex_In> parserVertices{};
+	std::vector<Vertex_Vehicle> parserVertices{};
 
 	ParseObj(filename, parserVertices, m_Indices);
 
-	for (const Vertex_In& vert : parserVertices)
+	for (const Vertex_Vehicle& vert : parserVertices)
 	{
-		Vertex_PosTex v{};
+		Vertex_Fire v{};
 		v.position = vert.position;
 		v.uv = vert.uv;
 
-		m_Vertices.push_back(v);
+		m_FireVertices.push_back(v);
 	}
-
 }
 
-bool Mesh::ParseObj(const std::string& filename, std::vector<Vertex_In>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding)
+bool Mesh::ParseObj(const std::string& filename, std::vector<Vertex_Vehicle>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding)
 {
 	std::ifstream file(filename);
 	if (!file)
@@ -308,7 +344,7 @@ bool Mesh::ParseObj(const std::string& filename, std::vector<Vertex_In>& vertice
 			//add the material index as attibute to the attribute array
 			//
 			// Faces or triangles
-			Vertex_In vertex{};
+			Vertex_Vehicle vertex{};
 			size_t iPosition, iTexCoord, iNormal;
 
 			uint32_t tempIndices[3];
@@ -401,6 +437,7 @@ bool Mesh::ParseObj(const std::string& filename, std::vector<Vertex_In>& vertice
 	}
 
 	return true;
+
 }
 
 

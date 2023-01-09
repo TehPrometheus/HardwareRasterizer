@@ -82,6 +82,7 @@
     <ClInclude Include="ColorRGB.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="Effect_Fire.h" />
     <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Mesh.h" />
@@ -90,7 +91,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Math.h" />
-    <ClInclude Include="Effect_PosTex.h" />
+    <ClInclude Include="Effect_Vehicle.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
@@ -99,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="Effect_Fire.cpp" />
     <ClCompile Include="Matrix.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
@@ -122,7 +124,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Effect_PosTex.cpp" />
+    <ClCompile Include="Effect_Vehicle.cpp" />
     <ClCompile Include="Vector2.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>

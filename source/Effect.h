@@ -1,5 +1,20 @@
 #pragma once
 #include "Texture.h"
+using namespace dae;
+
+enum class sampleState
+{
+	point,
+	linear,
+	anisotropic
+};
+
+enum class cullMode
+{
+	backCulling,
+	frontCulling,
+	noCulling
+};
 
 class Effect
 {
@@ -22,37 +37,50 @@ public:
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
 	ID3DX11EffectTechnique* GetTechniquePtr();
 
-	void SetWorldViewProjectionMatrix(const dae::Matrix& worldViewProjectionMatrix);
+	void SetWorldViewProjectionMatrix(const Matrix& worldViewProjectionMatrix);
 	void SetDiffuseMap(dae::Texture* pDiffuseTexture);
-	void ToggleSampleState();
+	
 
-private:
+	void ToggleSampleState();
+	void ToggleCullingMode();
+
+	sampleState GetSampleState() const;
+	cullMode GetCullMode() const;
+
+protected:
 
 	//------------------------------------------------
 	// Member variables						
 	//------------------------------------------------
 
 	const int NROFSAMPLESTATES{3};
+	const int NROFCULLMODES{3};
 
 
-	enum class sampleState
-	{
-		point,
-		linear,
-		anisotropic
-	};
 	sampleState m_SampleState = sampleState::point;
+	cullMode m_CullMode = cullMode::noCulling;
 
 	ID3DX11Effect* m_pEffect{ nullptr };
 	ID3DX11EffectTechnique* m_pActiveTechnique{nullptr};
 
-	ID3DX11EffectTechnique* m_pPointTechnique{ nullptr };
-	ID3DX11EffectTechnique* m_pLinearTechnique{ nullptr };
-	ID3DX11EffectTechnique* m_pAnisotropicTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pPointBackCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pLinearBackCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pAnisotropicBackCullTechnique{ nullptr };
+
+	ID3DX11EffectTechnique* m_pPointFrontCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pLinearFrontCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pAnisotropicFrontCullTechnique{ nullptr };
+
+	ID3DX11EffectTechnique* m_pPointNoCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pLinearNoCullTechnique{ nullptr };
+	ID3DX11EffectTechnique* m_pAnisotropicNoCullTechnique{ nullptr };
 
 	ID3DX11EffectMatrixVariable* m_pMatWorldViewProjVariable{ nullptr };
 
 	ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{ nullptr };
+	ID3DX11EffectShaderResourceVariable* m_pNormalMapVariable{ nullptr };
+	ID3DX11EffectShaderResourceVariable* m_pSpecularMapVariable{ nullptr };
+	ID3DX11EffectShaderResourceVariable* m_pGlossinessMapVariable{ nullptr };
 
 
 	//------------------------------------------------
@@ -60,6 +88,7 @@ private:
 	//------------------------------------------------
 
 	void BindShaderTechniques();
-
+	void BindShaderMatrices();
+	void BindShaderMaps();
 };
 

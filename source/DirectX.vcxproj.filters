@@ -37,7 +37,6 @@
     <ClInclude Include="Vector2.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h" />
     <ClInclude Include="ColorRGB.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -45,9 +44,6 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Effect.h">
-      <Filter>Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Effect_PosTex.h">
       <Filter>Effect</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
@@ -62,7 +58,18 @@
     <ClInclude Include="Texture.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Effect_Vehicle.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect_Fire.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -81,11 +88,7 @@
     <ClCompile Include="Vector2.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp" />
     <ClCompile Include="Effect.cpp">
-      <Filter>Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="Effect_PosTex.cpp">
       <Filter>Effect</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
@@ -99,6 +102,15 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect_Vehicle.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect_Fire.cpp">
+      <Filter>Effect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
